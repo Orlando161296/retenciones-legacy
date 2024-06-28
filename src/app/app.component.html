@@ -1,0 +1,212 @@
+<mat-toolbar color="primary" position="fixed">
+  <span class="">Cecosesola</span>
+</mat-toolbar>
+
+<form [formGroup]="facturaForm" class="container" style="padding-top: 30px">
+  <div class="row">
+    <h4>Responsable de Retención</h4>
+    <mat-form-field style="flex: 1; width: 50%">
+      <mat-label>Responsable</mat-label>
+      <input
+        type="text"
+        matInput
+        formControlName="responsable"
+        placeholder="responsable"
+      />
+    </mat-form-field>
+  </div>
+
+  <mat-form-field style="flex: 1; width: 50%">
+    <mat-label>Fecha de Emisión</mat-label>
+    <input matInput [matDatepicker]="picker3" formControlName="fechaEmision" />
+    <mat-datepicker-toggle
+      matIconSuffix
+      [for]="picker3"
+    ></mat-datepicker-toggle>
+    <mat-datepicker #picker3></mat-datepicker>
+  </mat-form-field>
+
+  <div class="row">
+    <h4>N° de Comprobante</h4>
+    <mat-form-field style="flex: 1; width: 50%">
+      <mat-label>N° Comprobante</mat-label>
+      <input
+        type="number"
+        matInput
+        formControlName="comprobante"
+        placeholder="0000000000"
+      />
+    </mat-form-field>
+  </div>
+
+  <mat-form-field style="flex: 1; width: 50%">
+    <mat-label>Periodo Fiscal</mat-label>
+    <mat-select formControlName="periodoF">
+      <mat-option *ngFor="let periodo of periodoFiscal" [value]="periodo.value">
+        {{ periodo.value }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <div class="row">
+    <div class="col-12 col-sm-6 col-xs-12">
+      <h4>Datos Fiscales</h4>
+      <mat-form-field style="flex: 1; width: 100%">
+        <mat-label>Nombre</mat-label>
+        <input
+          type="text"
+          matInput
+          formControlName="nombre"
+          placeholder="Nombre"
+        />
+      </mat-form-field>
+      <mat-form-field style="flex: 1; width: 100%">
+        <mat-label>Rif</mat-label>
+        <input
+          type="text"
+          matInput
+          formControlName="rif"
+          placeholder="J-00000000"
+        />
+      </mat-form-field>
+      <mat-form-field style="flex: 1; width: 100%">
+        <mat-label>Dirección Fiscal</mat-label>
+        <input
+          type="text"
+          matInput
+          formControlName="direccionFiscal"
+          placeholder="Dirección"
+        />
+      </mat-form-field>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xs-12">
+      <h4>Datos Factura</h4>
+      <mat-form-field style="flex: 1; width: 100%">
+        <mat-label>N° de operación</mat-label>
+        <input
+          type="text"
+          matInput
+          formControlName="numeroOperacion"
+          placeholder="01"
+        />
+      </mat-form-field>
+      <mat-form-field style="flex: 1; width: 100%">
+        <mat-label>Fecha de la Factura</mat-label>
+        <input
+          matInput
+          [matDatepicker]="picker2"
+          formControlName="fechaFactura"
+        />
+        <mat-datepicker-toggle
+          matIconSuffix
+          [for]="picker2"
+        ></mat-datepicker-toggle>
+        <mat-datepicker #picker2></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field style="flex: 1; width: 100%">
+        <mat-label>N° de Factura</mat-label>
+        <input
+          type="text"
+          matInput
+          formControlName="numeroFactura"
+          placeholder="000-000"
+        />
+      </mat-form-field>
+      <mat-form-field style="flex: 1; width: 100%">
+        <mat-label>N° de Control</mat-label>
+        <input
+          type="text"
+          matInput
+          formControlName="numeroControl"
+          placeholder="000-00"
+        />
+      </mat-form-field>
+      <mat-form-field style="flex: 1; width: 100%">
+        <mat-label>Porcentaje a Retener</mat-label>
+        <mat-select formControlName="porcentajeRetener">
+          <mat-option *ngFor="let option of options" [value]="option.value">
+            {{ option.viewValue }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field style="flex: 1; width: 100%">
+        <mat-label>Base Imponible</mat-label>
+        <input
+          type="number"
+          matInput
+          formControlName="baseImponible"
+          placeholder="25,80"
+        />
+      </mat-form-field>
+      <mat-form-field style="flex: 1; width: 100%">
+        <mat-label>Impuesto a Retener</mat-label>
+        <mat-select formControlName="impuestoRetener">
+          <mat-option
+            *ngFor="let alicuota of alicuotas"
+            [value]="alicuota.value"
+          >
+            {{ alicuota.viewValue }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <button mat-stroked-button color="primary" (click)="calculateRetention()">
+        Calcular Retención
+      </button>
+      <button
+        mat-flat-button
+        color="accent"
+        *ngIf="calculate"
+        (click)="printPdf()"
+      >
+        Generar PDF
+      </button>
+    </div>
+  </div>
+</form>
+
+<div class="row" *ngIf="calculate">
+  <div class="col-12">
+    <mat-card class="summary-card mat-elevation-z8">
+      <mat-card-header color="primary">
+        <mat-card-title>Resumen de Retención</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="summary-item">
+          <h2 class="summary-label">BASE IMPONIBLE:</h2>
+          <h2 class="summary-value large-text">
+            {{ baseImponible | number : "1.2-2" }}
+          </h2>
+        </div>
+        <div class="summary-item">
+          <h2 class="summary-label">I.V.A:</h2>
+          <h2 class="summary-value large-text">{{ iva | number : "1.2-2" }}</h2>
+        </div>
+        <div class="summary-item">
+          <h2 class="summary-label">TOTAL DE FACTURA:</h2>
+          <h2 class="summary-value large-text">
+            {{ totalInvoice | number : "1.2-2" }}
+          </h2>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="summary-item">
+          <h2 class="summary-label">I.V.A RETENIDO:</h2>
+          <h2 class="summary-value large-text">
+            {{ ivaRetener | number : "1.2-2" }}
+          </h2>
+        </div>
+        <div class="summary-item">
+          <h2 class="summary-label">TOTAL A PAGAR:</h2>
+          <h2 class="summary-value large-text">
+            {{ totalPayd | number : "1.2-2" }}
+          </h2>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
